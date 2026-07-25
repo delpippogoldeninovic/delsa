@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Elsa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= BASE & CUSTOM CURSOR ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size: 24px;'><text y='20'>🤍</text></svg>"), auto;
+        }
+
+        a, button, input {
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size: 24px;'><text y='20'>✨</text></svg>"), pointer;
+        }
+
+        /* ================= STARRY BACKGROUND ================= */
+        #stars-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ================= TYPOGRAPHY & LAYOUT ================= */
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .text-center { text-align: center; }
+        .text-glow { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        .accent { color: #d4af37; } 
+
+        section {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 4rem 2rem;
+            opacity: 0; transform: translateY(50px);
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        section.visible { opacity: 1; transform: translateY(0); }
+
+        /* ================= LOADING ================= */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 2s ease; padding: 1rem; text-align: center;
+        }
+        .typing-container { display: inline-block; text-align: center; min-height: 2rem; }
+        
+        .btn-open {
+            margin-top: 3rem; padding: 12px 30px;
+            background: transparent; color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px;
+            border-radius: 30px; transition: all 0.4s ease;
+            opacity: 0; pointer-events: none;
+        }
+        .btn-open:hover { background: white; color: black; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+        /* ================= TIMELINE ================= */
+        .timeline-box {
+            border-left: 2px solid #d4af37; padding-left: 20px; margin-top: 2rem; text-align: left;
+        }
+        .timeline-item { margin-bottom: 1.5rem; position: relative; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -26px; top: 5px;
+            width: 10px; height: 10px; border-radius: 50%; background: #d4af37;
+        }
+
+        /* ================= BENTO GRID ================= */
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; max-width: 1000px; width: 100%; margin-top: 2rem;
+        }
+        .bento-item {
+            position: relative; border-radius: 15px; overflow: hidden;
+            aspect-ratio: 1 / 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #111; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            transition: transform 0.5s ease; padding: 1rem;
+        }
+        .bento-item:hover { transform: scale(1.05); z-index: 2; }
+        .bento-item img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; filter: grayscale(80%); transition: filter 0.5s ease;
+        }
+        .bento-item:hover img { filter: grayscale(0%); }
+
+        /* ================= SPOTIFY WRAPPED ================= */
+        .spotify-card {
+            background: linear-gradient(135deg, #1DB954, #121212);
+            padding: 3rem; border-radius: 20px; text-align: center;
+            box-shadow: 0 20px 40px rgba(29, 185, 84, 0.3);
+            max-width: 400px; width: 100%; display: flex; flex-direction: column; align-items: center;
+        }
+        .spotify-cover {
+            width: 180px; height: 180px; border-radius: 15px;
+            object-fit: cover; margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* ================= LETTER & BOXES ================= */
+        .glass-box {
+            background: rgba(25, 25, 25, 0.6); backdrop-filter: blur(10px);
+            padding: 3rem; border-radius: 20px; max-width: 700px; width: 100%;
+            border: 1px solid rgba(255,255,255,0.1); line-height: 1.8;
+        }
+
+        /* ================= MISC ================= */
+        ul.custom-list { list-style: none; margin-top: 1.5rem; text-align: left;}
+        ul.custom-list li { margin-bottom: 1rem; font-size: 1.1rem; }
+        ul.custom-list li::before { content: '✨ '; }
+        
+        #ending-btn {
+            padding: 15px 40px; background: white; color: black;
+            border: none; border-radius: 50px; font-size: 1.2rem;
+            font-family: 'Cinzel', serif; margin-top: 2rem; transition: transform 0.3s ease;
+        }
+        #ending-btn:hover { transform: scale(1.1); }
+
+        /* ================= MOBILE RESPONSIVE ================= */
+        @media (max-width: 768px) {
+            section { padding: 3rem 1.5rem; }
+            h1 { font-size: 2.5rem !important; }
+            h2 { font-size: 1.5rem !important; }
+            h3 { font-size: 1.2rem !important; }
+            p, li { font-size: 1rem !important; }
+            
+            #elsa-name { font-size: 3.5rem !important; letter-spacing: 5px !important; }
+            .apple-counter h1 { font-size: 4.5rem !important; }
+            .apple-counter h2 { font-size: 1.8rem !important; }
+            
+            .glass-box { padding: 1.5rem; }
+            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .spotify-card { padding: 2rem 1.5rem; }
+            .spotify-cover { width: 140px; height: 140px; }
+            
+            #typed-opening { font-size: 1.1rem !important; line-height: 1.6; }
+            #loading-text { font-size: 0.9rem !important; }
+            .btn-open { font-size: 0.8rem; padding: 10px 20px; }
+            #ending-btn { font-size: 1rem; padding: 12px 30px; }
+        }
+    </style>
+</head>
+<body>
+     <audio id="bg-music" loop preload="auto">
+        <source src="https://media1.vocaroo.com/mp3/19k2W9NFVbHA" type="audio/mpeg">
+    </audio>
+
+    <div id="stars-container"></div>
+
+    <div id="loading-screen">
+        <div class="typing-container">
+            <span id="loading-text" class="cinzel" style="letter-spacing: 2px;"></span>
+        </div>
+        <button id="btn-start" class="btn-open">Open Your Birthday Gift</button>
+    </div>
+
+    <section id="opening">
+        <div class="typing-container" style="height: auto; min-height: 80px;">
+            <span id="typed-opening" style="font-size: 1.5rem; line-height: 2;"></span>
+        </div>
+        <h1 id="elsa-name" class="cinzel text-glow" style="font-size: 5rem; letter-spacing: 10px; margin-top: 2rem; opacity: 0;">ELSA</h1>
+    </section>
+
+    <section class="reveal">
+        <h2 class="cinzel accent" style="margin-bottom: 2rem; font-size: 2rem; text-align: center;">Chapter 1: Before You</h2>
+        <div class="text-center glass-box">
+            <p>Sebelum bertemu kamu...</p><br>
+            <p>Hidup berjalan seperti biasa.</p>
+            <p>Bangun. Kerja. Pulang. Ulangi lagi.</p><br>
+            <p style="color: gray;">Semuanya hitam putih.</p><br>
+            <p class="accent text-glow" style="font-size: 1.5rem;">"Lalu muncul warna."</p>
+        </div>
+    </section>
+
+    <section class="reveal">
+        <h2 class="cinzel" style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">The Beginning</h2>
+        <p style="color: #ccc; margin-bottom: 2rem;">September 2025</p>
+        <div class="glass-box text-center">
+            <p>Aku tidak pernah menyangka pertemuan sederhana itu akan menjadi awal dari begitu banyak cerita.</p><br>
+            <p>Saat itu kita hanyalah dua orang asing.</p><br>
+            <p>Sekarang...</p>
+            <h3 class="accent" style="font-size: 1.5rem; margin-top: 1rem;">Kamu menjadi rumah yang selalu ingin aku tuju.</h3>
+        </div>
+    </section>
+
+    <section class="reveal">
+        <h2 class="cinzel" style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Our Journey</h2>
+        <div class="timeline-box">
+            <div class="timeline-item"><strong>September 2025</strong> - Cerita ini dimulai.</div>
+            <div class="timeline-item">Pertama bertemu.</div>
+            <div class="timeline-item">Pertama ngobrol.</div>
+            <div class="timeline-item">Pertama tertawa bersama.</div>
+            <div class="timeline-item">Kenangan demi kenangan tercipta.</div>
+            <div class="timeline-item accent"><strong>Hari ini</strong> - Happy Birthday!</div>
+        </div>
+    </section>
+
+    <section class="reveal">
+        <h2 class="cinzel" style="text-align: center;">Digital Scrapbook</h2>
+        <p style="margin-top: 1rem; color: #ccc; text-align: center;">Hari sederhana, senyum luar biasa.</p>
+        <div class="bento-grid">
+            <div class="bento-item"><img src="https://i.postimg.cc/0Q0k7Fw9/IMG-20251009-WA0024.jpg" alt="Gallery"></div>
+            <div class="bento-item"><img src="https://i.postimg.cc/fLfzYp9z/IMG-20251009-WA0025.jpg" alt="Gallery"></div>
+            <div class="bento-item"><img src="https://i.postimg.cc/W3wN0Ckc/IMG-20251009-WA0029.jpg" alt="Gallery"></div>
+            <div class="bento-item"><img src="https://i.postimg.cc/Y9zrQZWw/IMG-20260222-WA0004.jpg" alt="Gallery"></div>
+            <div class="bento-item"><img src="https://i.postimg.cc/85mpL96S/IMG-20260410-WA0021.jpg" alt="Gallery"></div>
+            <div class="bento-item"><img src="https://i.postimg.cc/1trmD2qS/IMG-20260411-WA0003.jpg" alt="Gallery"></div>
+        </div>
+        <p style="margin-top: 2rem; max-width: 600px; text-align: center;">Terima kasih untuk setiap kenangan. Semoga album ini terus bertambah.</p>
+    </section>
+
+    <section class="reveal">
+        <h2 class="cinzel accent" style="text-align: center; margin-bottom: 2rem;">Things I Love About You</h2>
+        <div class="glass-box">
+            <ul class="custom-list">
+                <li>Aku suka senyummu.</li>
+                <li>Aku suka tawamu.</li>
+                <li>Aku suka caramu peduli.</li>
+                <li>Aku suka semangatmu.</li>
+                <li>Aku suka sifatmu.</li>
+                <li>Aku suka caramu mendengarkan.</li>
+                <li class="accent">Aku suka semua hal kecil tentangmu.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="reveal">
+        <div class="spotify-card">
+            <h2 style="font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 2px;">MoyMoyMesh</h2>
+            <img src="https://i.postimg.cc/G2xLvVym/IMG-20251116-WA0010.jpg" alt="Spotify Cover" class="spotify-cover">
+            <h4 style="color: #ccc; text-transform: uppercase;">Top Tier</h4>
+            <h1 style="font-size: 2.5rem; margin: 5px 0;">Elsa</h1>
+            <br>
+            <h4 style="color: #ccc; text-transform: uppercase;">Si Buled</h4>
+            <br>
+            <p style="font-size: 0.8rem; color: #eee;">Born since July 2002</p>
+        </div>
+    </section>
+
+    <section class="reveal apple-counter text-center">
+        <h1 class="cinzel" style="font-size: 7rem; line-height: 1;">24.</h1>
+        <h2 style="font-size: 2.5rem; margin-top: 1rem;">Years.</h2>
+        <h2 style="font-size: 2.5rem; color: #ccc;">Countless Smiles.</h2>
+        <h2 style="font-size: 2.5rem; color: #999;">One Person.</h2>
+        <h1 class="accent cinzel text-glow" style="font-size: 3.5rem; margin-top: 2rem;">Infinite Happiness.</h1>
+    </section>
+
+    <section class="reveal">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%;">
+            <div class="glass-box" style="flex: 1; min-width: 280px; padding: 2rem;">
+                <h3 class="cinzel accent text-center" style="margin-bottom: 1rem;">Little Wishes</h3>
+                <ul class="custom-list">
+                    <li>Semoga kamu sehat.</li>
+                    <li>Semoga bahagia.</li>
+                    <li>Semoga semua impianmu tercapai.</li>
+                    <li>Semoga langkahmu selalu dimudahkan.</li>
+                </ul>
+            </div>
+            <div class="glass-box" style="flex: 1; min-width: 280px; padding: 2rem;">
+                <h3 class="cinzel accent text-center" style="margin-bottom: 1rem;">Future Dreams</h3>
+                <ul class="custom-list">
+                    <li>Travel bersama.</li>
+                    <li>Rumah impian.</li>
+                    <li>Menikah.</li>
+                    <li>Membangun keluarga.</li>
+                    <li>Menyelesaikan Bucket List.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="reveal" style="height: auto;">
+        <div class="glass-box text-center">
+            <h2 class="cinzel accent" style="margin-bottom: 2rem;">Selamat Ulang Tahun.</h2>
+            <p>Terima kasih sudah menjadi bagian penting dalam hidupku, dan terima kasih untuk semua momen berharga yang kita ciptakan bersama.</p><br>
+            <p>Semoga di usia yang baru ini, kamu selalu diberikan kesehatan, kebahagiaan yang berlimpah, dan kemudahan dalam mencapai semua yang kamu impikan.</p><br>
+            <p>Aku akan selalu mendukung setiap langkah dan perjalananmu ke depan.</p><br>
+            <p class="accent text-glow" style="font-style: italic; font-weight: 600; font-size: 1.2rem;">I Love You Moree</p>
+        </div>
+    </section>
+
+    <section class="reveal text-center">
+        <h3 style="color: #ccc; margin-bottom: 1rem;">I don’t promise a perfect life.</h3>
+        <h2 class="cinzel text-glow" style="margin-bottom: 3rem;">I promise that as long as I can,<br>I’ll always choose you.</h2>
+        <div style="margin-top: 2rem;">
+            <p>Every universe has billions of stars.</p>
+            <p style="margin-bottom: 2rem;">Mine only needed one.</p>
+        </div>
+        <button id="ending-btn">See You In Our Next Chapter</button>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        const starContainer = document.getElementById('stars-container');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = `${Math.random() * 3 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            star.addEventListener('click', () => {
+                alert("Kalau aku bisa memberimu satu hadiah... Aku ingin kamu melihat dirimu melalui mataku. ✨");
+            });
+            starContainer.appendChild(star);
+        }
+
+        try {
+            const lenis = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        } catch (error) {}
+
+        setTimeout(() => {
+            const btn = document.getElementById('btn-start');
+            if (btn && btn.style.opacity !== '1') {
+                document.getElementById('loading-text').innerHTML = "This page was made with love.";
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        }, 12000);
+
+        try {
+            new Typed('#loading-text', {
+                strings: ["Preparing something made just for you...", "For Elsa Lestari.", "This page was made with love."],
+                typeSpeed: 50, backSpeed: 30, backDelay: 1000,
+                onComplete: function() {
+                    const btn = document.getElementById('btn-start');
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+        } catch(error) {}
+
+        document.getElementById('btn-start').addEventListener('click', () => {
+            document.getElementById('bg-music').play().catch(e => console.warn("Audio diredam"));
+            gsap.to("#loading-screen", { opacity: 0, duration: 1.5, display: "none" });
+            document.body.style.overflowY = "auto";
+
+            setTimeout(() => {
+                new Typed('#typed-opening', {
+                    strings: [
+                        "Hari ini...<br>Dunia mungkin melihatnya sebagai tanggal biasa.",
+                        "Tapi bagiku...<br>Hari ini adalah hari ketika seseorang yang sangat berarti dilahirkan.",
+                        "There are over 200 billion stars in our galaxy.<br>Yet somehow... I found my favorite one."
+                    ],
+                    typeSpeed: 40, backSpeed: 20, backDelay: 1500, showCursor: true,
+                    onComplete: function() {
+                        gsap.to(".typed-cursor", { opacity: 0, duration: 0.5 });
+                        gsap.to("#elsa-name", { opacity: 1, duration: 2, y: -20 });
+                    }
+                });
+            }, 1500);
+        });
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach((section) => { observer.observe(section); });
+
+        document.getElementById('ending-btn').addEventListener('click', () => {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        });
+    </script>
+</body>
+</html>
